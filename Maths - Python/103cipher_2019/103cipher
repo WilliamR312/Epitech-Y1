@@ -1,0 +1,283 @@
+#!/usr/bin/python3
+
+import sys
+import math
+class matrix_all :
+    matrix_key_3x3 = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+    ]
+    matrix_key_2x2 = [
+        [0, 0],
+        [0, 0]
+    ]
+    matrix_key_2x1 = [
+        [0, 0]
+    ]
+    matrix_key_1x1 = [
+        [0]
+    ]
+    matrix_ascii_3x1 = [
+        [0, 0, 0]
+    ]
+    matrix_ascii_2x1 = [
+        [0, 0]
+    ]
+    matrix_ascii_1x1 = [
+        [0]
+    ]
+    matrix_result_3x1 = [
+        [0, 0, 0]
+    ]
+    matrix_result_2x1 = [
+        [0, 0]
+    ]
+    matrix_result_1x1 = [
+        [0]
+    ]
+    buffer_3x1 = [
+        [0, 0, 0]
+    ]
+    buffer_2x1 = [
+        [0, 0]
+    ]
+    key_size = 0
+    to_crypt_nb_char = 0
+
+
+def check_args() :
+    if len(sys.argv) != 4 :
+        sys.exit(84) 
+    if sys.argv[3] != '0' and sys.argv[3] != '1' :
+        sys.exit(84)
+    try :
+        str(sys.argv[1])
+        str(sys.argv[2])
+        int(sys.argv[3])
+    except :
+        sys.exit(84)
+
+def help() :
+    if len(sys.argv) == 2 and sys.argv[1] == '-h' :
+        print ("USAGE")
+        print ("    ./103cipher message key flag")
+        print ("DESCRIPTION")
+        print ("    message    a message, made of ASCII characters")
+        print ("    key        the encryption key, made of ASCII characters")
+        print ("    flag       0 for the message to be encrypted, I to be decrypted")
+        sys.exit (0)
+
+def key_management() :
+
+    i = 0
+    j = 0
+
+    print('Key matrix:')
+
+    if len(str(sys.argv[2])) == 1 :
+        matrix_all.key_size = 1
+
+        matrix_all.matrix_key_1x1[i][j] = ord(sys.argv[2])
+        print(str(matrix_all.matrix_key_1x1[0][0]))
+
+    if len(str(sys.argv[2])) == 2 :
+        matrix_all.key_size = 2
+        for yuri in str(sys.argv[2]) :
+            matrix_all.matrix_key_2x1[i][j] = ord(yuri)
+            j += 1
+        print(str(matrix_all.matrix_key_2x1[0][0])+"\t"+str(matrix_all.matrix_key_2x1[0][1]))
+
+    if len(str(sys.argv[2])) == 4 or len(str(sys.argv[2])) == 3 :
+        matrix_all.key_size = 4
+        for yuri in str(sys.argv[2]) :
+            matrix_all.matrix_key_2x2[i][j] = ord(yuri)
+            j += 1
+            if j > 1 :
+                j = 0
+                i += 1
+            a = 0
+        while a != 2 :
+            print(str(matrix_all.matrix_key_2x2[a][0])+"\t"+str(matrix_all.matrix_key_2x2[a][1]))
+            a += 1
+
+    if len(str(sys.argv[2])) > 4 :
+        matrix_all.key_size = 5
+        for yuri in str(sys.argv[2]) :
+            matrix_all.matrix_key_3x3[i][j] = ord(yuri)
+            j += 1
+            if j > 2 :
+                j = 0
+                i += 1
+        a = 0
+        while a != 3 :
+            print(str(matrix_all.matrix_key_3x3[a][0])+"\t"+str(matrix_all.matrix_key_3x3[a][1])+"\t"+str(matrix_all.matrix_key_3x3[a][2]))
+            a += 1
+    print('')
+
+def to_ascii() :
+    i = 0
+    j = 0
+    c = 0
+
+    matrix_all.to_crypt_nb_char = int(len(sys.argv[1]))
+
+    if matrix_all.key_size == 5 :
+        for spootnik in str(sys.argv[1]) :
+            matrix_all.matrix_ascii_3x1[i][j] = ord(spootnik)
+            j += 1
+            c += 1
+            if j > 2 :
+                if c != matrix_all.to_crypt_nb_char :
+                    matrix_all.matrix_ascii_3x1.append([0, 0, 0])
+                j = 0
+                i += 1
+
+    if matrix_all.key_size == 4 or matrix_all.key_size == 2 :
+        for spootnik in str(sys.argv[1]) :
+            matrix_all.matrix_ascii_2x1[i][j] = ord(spootnik)
+            j += 1
+            c += 1
+            if j > 1 :
+                if c != matrix_all.to_crypt_nb_char :
+                    matrix_all.matrix_ascii_2x1.append([0, 0])
+                j = 0
+                i += 1
+
+    if matrix_all.key_size == 1 :
+        for spootnik in str(sys.argv[1]) :
+            matrix_all.matrix_ascii_1x1[i][j] = ord(spootnik)
+            c += 1
+            if c != matrix_all.to_crypt_nb_char :
+                matrix_all.matrix_ascii_1x1.append([0])
+            i += 1
+
+def encrypt_message() :
+    print('Encrypted message:')
+    a = 0
+    b = 0
+    c = 0
+    i = 0
+    j = 0
+    display = 0
+
+    if matrix_all.key_size == 5 :
+        if matrix_all.to_crypt_nb_char % 3 == 1 : 
+            matrix_all.to_crypt_nb_char += 2
+        if matrix_all.to_crypt_nb_char % 3 == 2 : 
+            matrix_all.to_crypt_nb_char += 1
+
+        while c != matrix_all.to_crypt_nb_char : 
+            matrix_all.matrix_result_3x1[a][b] = matrix_all.matrix_key_3x3[0][b] * matrix_all.matrix_ascii_3x1[a][0] + matrix_all.matrix_key_3x3[1][b] * matrix_all.matrix_ascii_3x1[a][1] + matrix_all.matrix_key_3x3[2][b] * matrix_all.matrix_ascii_3x1[a][2]
+            b += 1
+            c += 1
+            if b > 2 :
+                if c != matrix_all.to_crypt_nb_char :
+                    matrix_all.matrix_result_3x1.append([0, 0, 0])
+                a += 1
+                b = 0
+
+        while display != matrix_all.to_crypt_nb_char :
+            if display + 1 != matrix_all.to_crypt_nb_char :
+                print('%.0f' %float(matrix_all.matrix_result_3x1[i][j]), end = " ")
+            elif display + 1 == matrix_all.to_crypt_nb_char :
+                print('%.0f' %float(matrix_all.matrix_result_3x1[i][j]))
+            j += 1
+            if j > 2 :
+                j = 0
+                i += 1
+            display += 1
+
+    if matrix_all.key_size == 1 :
+        while c != matrix_all.to_crypt_nb_char :
+            matrix_all.matrix_result_1x1[a][0] = matrix_all.matrix_key_1x1[0][0] * matrix_all.matrix_ascii_1x1[a][0]
+            a += 1
+            c += 1
+            if c != matrix_all.to_crypt_nb_char :
+                matrix_all.matrix_result_1x1.append([0])
+
+        while display != matrix_all.to_crypt_nb_char :
+            if display + 1 != matrix_all.to_crypt_nb_char :
+                print('%.0f' %float(matrix_all.matrix_result_1x1[i][0]), end = " ")
+            elif display + 1 == matrix_all.to_crypt_nb_char :
+                print('%.0f' %float(matrix_all.matrix_result_1x1[i][0]))
+            i += 1
+            display += 1
+
+    if matrix_all.key_size == 2 :
+        if matrix_all.to_crypt_nb_char % 2 == 1 :
+            matrix_all.to_crypt_nb_char += 1
+
+        while c != matrix_all.to_crypt_nb_char :
+            matrix_all.matrix_result_2x1[a][b] = matrix_all.matrix_key_2x1[0][b] * matrix_all.matrix_ascii_2x1[a][0] + matrix_all.matrix_key_2x1[0][b] * matrix_all.matrix_ascii_2x1[a][1]
+            b += 1
+            c += 1
+
+            if b > 1 :
+                b = 0
+                a += 1
+                if c != matrix_all.to_crypt_nb_char :
+                    matrix_all.matrix_result_2x1.append([0, 0])
+
+        while display != matrix_all.to_crypt_nb_char :
+            if display + 1 != matrix_all.to_crypt_nb_char :
+                print('%.0f' %float(matrix_all.matrix_result_2x1[i][j]), end = " ")
+            elif display + 1 == matrix_all.to_crypt_nb_char :
+                print('%.0f' %float(matrix_all.matrix_result_2x1[i][j]))
+            j += 1
+            display += 1
+            if j > 1 :
+                j = 0
+                i += 1
+
+    if matrix_all.key_size == 4 :
+        if matrix_all.to_crypt_nb_char % 2 == 1 :
+            matrix_all.to_crypt_nb_char += 1
+
+        while c != matrix_all.to_crypt_nb_char :
+            matrix_all.matrix_result_2x1[a][b] = matrix_all.matrix_key_2x2[0][b] * matrix_all.matrix_ascii_2x1[a][0] + matrix_all.matrix_key_2x2[1][b] * matrix_all.matrix_ascii_2x1[a][1]
+            b += 1
+            c += 1
+            if b > 1 :
+                b = 0
+                a += 1
+                if c != matrix_all.to_crypt_nb_char :
+                    matrix_all.matrix_result_2x1.append([0, 0])
+
+        while display != matrix_all.to_crypt_nb_char :
+            if display + 1 != matrix_all.to_crypt_nb_char :
+                print('%.0f' %float(matrix_all.matrix_result_2x1[i][j]), end = " ")
+            elif display + 1 == matrix_all.to_crypt_nb_char :
+                print('%.0f' %float(matrix_all.matrix_result_2x1[i][j]))
+            j += 1
+            display += 1
+            if j > 1 :
+                j = 0
+                i += 1
+
+def key_decrypt() :
+    print("Key matrix:")
+    if len(sys.argv[2]) == 1 :
+        matrix_all.matrix_key_1x1[0][0] = 1 / ord(sys.argv[2])
+        print(str(round((matrix_all.matrix_key_1x1[0][0]), 3)))
+        print('')
+    else :
+        print('')
+
+def decrypt_message() :
+    print("Decrypted message:")
+
+
+def main():
+    help()
+    check_args()
+    if int(sys.argv[3]) == 0 :
+        key_management()
+        to_ascii()
+        encrypt_message()
+    if int(sys.argv[3]) == 1 :
+        key_decrypt()
+        decrypt_message()
+
+if __name__ == "__main__" :
+    main()

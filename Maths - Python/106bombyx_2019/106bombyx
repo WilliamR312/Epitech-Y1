@@ -1,0 +1,88 @@
+#!/usr/bin/python3
+
+import sys
+import math
+
+def check_args():
+
+    if len(sys.argv) < 2 or len(sys.argv) >= 5 :
+        sys.exit(84)
+    if len(sys.argv) == 2:
+        try :
+            if sys.argv[1] == '-h' and len(sys.argv) == 2:
+                help()
+        except :
+            sys.exit(84)
+        sys.exit(84)
+    if len(sys.argv) == 4:
+        try :
+            int(sys.argv[1])
+            int(sys.argv[2])
+            int(sys.argv[3])
+        except :
+            sys.exit(84)
+        if int(sys.argv[2]) > int(sys.argv[3]):
+            sys.exit(84)
+
+    if len(sys.argv) == 3:
+        try:
+            int(sys.argv[1])
+            float(sys.argv[2])
+        except:
+            sys.exit(84)
+        if float(sys.argv[2]) < 1 or float(sys.argv[2]) > 4 :
+            sys.exit(84)
+
+    if int(sys.argv[1]) <= 0:
+        sys.exit(84)
+
+def help():
+    if sys.argv[1] == '-h' and len(sys.argv) == 2:
+        print('USAGE')
+        print('    ./106bombyx n [k | i0 i1]\n')
+        print('DESCRIPTION')
+        print('    n        number of first generation individuals')
+        print('    k        growth rate from 1 to 4')
+        print('    i0       intitial generation (included)')
+        print('    i1       final generation (included)')
+        sys.exit(0)
+
+def compute_one():
+    x = int(sys.argv[1])
+    k = float(sys.argv[2])
+    g = 1
+
+    if len(sys.argv) == 3:
+        while (g <= 100) :
+            print('%d' %g, '%.2f'%x)
+            x = k * x * ((1000 - x) / 1000)
+            g = g + 1
+
+def compute_two():
+    x = 0
+    initial_gen = int(sys.argv[1])
+    i0 = int(sys.argv[2])
+    i1 = int(sys.argv[3])
+    g = 1
+    k = 1
+    if len(sys.argv) == 4:
+        while (k <= 4) :
+            g = 1
+            x = initial_gen
+            while (g < i0) :
+                x = k * x * ((1000 - x) / 1000)
+                g += 1
+            while (g <= i1) :
+                print('%.2f' %k, '%.2f' %x)
+                x = k * x * ((1000 - x) / 1000)
+                g += 1
+            k += 0.01
+
+def main():
+    check_args()
+    if len(sys.argv) == 3 :
+        compute_one()
+    else :
+        compute_two()
+
+main()

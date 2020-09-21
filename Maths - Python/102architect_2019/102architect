@@ -1,0 +1,178 @@
+#!/usr/bin/python3
+
+import sys
+import math
+
+class matrix_all :
+    matrix_id = [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+    ]
+
+def compute_matrix(matrix, matrix_id) :
+    matrix_result = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+    ]
+    i = 0
+    j = 0
+    while i != 3 :
+        while j != 3:
+            matrix_result[i][j] = (float (matrix[i][0]) * float (matrix_all.matrix_id[0][j])) + (float (matrix[i][1]) * float (matrix_all.matrix_id[1][j])) + (float (matrix[i][2]) * float (matrix_all.matrix_id[2][j]))
+            j += 1
+        j = 0
+        i += 1
+    return matrix_result
+
+def print_matrix(matrix) :
+    a = 0
+    while a != 3 :
+        print('%.2f' %float(matrix[a][0]), '%.2f'%float(matrix[a][1]), '%.2f'%float(matrix[a][2]))
+        a += 1
+
+def compute_t(i):
+    print('Translation along vector ('+ sys.argv[i + 1]+', '+ sys.argv[i + 2]+')')
+    matrix_translation = [
+        [1, 0, sys.argv[i + 1]],
+        [0, 1, sys.argv[i + 2]],
+        [0, 0, 1]]
+    return matrix_translation
+
+def compute_r(i):
+    print('Rotation by a '+sys.argv[i + 1]+' degree angle')
+    angle_rad = float(math.radians(float(sys.argv[i + 1])))
+    cos = math.cos(angle_rad)
+    sin = math.sin(angle_rad)
+    matrix_rotation = [
+        [cos, -sin, 0],
+        [sin, cos, 0],
+        [0, 0, 1]]
+    return matrix_rotation
+
+def compute_z(i):
+    print ('Scaling by factors '+ sys.argv[i + 1]+' and ' +sys.argv[i + 2])
+    matrix_scaling = [
+        [float(sys.argv[i + 1]), 0, 0],
+        [0, float(sys.argv[i + 2]), 0],
+        [0, 0, 1]]
+    return matrix_scaling
+
+def compute_s(i):
+    print ('Reflection over an axis with an inclination angle of ' +sys.argv[i + 1]+' degrees')
+    matrix_reflex = [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1]]
+    return matrix_reflex
+
+def help():
+    print('USAGE')
+    print('    ./102architect x y transfo1 arg11 [arg12] [transfo2 arg12[arg22]] ...\n')
+    print("DESCRIPTION")
+    print('    x abscissa of the original point')
+    print('    y ordinate of the original point\n')
+    print('    transfo arg1 [arg2]')
+    print('    -t i j  translation along vector (i, j)')
+    print('    -z m n  scaling by factors m (x-axis) and n (y-axis)')
+    print('    -r d    rotation centered in 0 by a d degree angle')
+    print('    -s d    reflection over the axis passing through 0 with an inclination angle of degrees')
+
+def check_args() :
+    op = 0
+    c = 3
+    while (c <= len(sys.argv[c])) :
+
+        if sys.argv[c] == '-t' :
+            try :
+                op = int(sys.argv[c + 1]) + int(sys.argv[c + 2])
+            except :
+                sys.exit(84)
+            c += 3
+        elif sys.argv[c] == '-z' :
+            try :
+                op = float(sys.argv[c + 1]) + float(sys.argv[c + 2])
+            except :
+                sys.exit(84)
+            c += 3
+        elif sys.argv[c] == '-r' :
+            try :
+                op = int(sys.argv[c + 1]) + int(sys.argv[c + 1])
+            except :
+                sys.exit(84)
+            c += 2
+        elif sys.argv[c] == '-s' :
+            try :
+                op = int(sys.argv[c + 1]) + int(sys.argv[c + 1])
+            except :
+                sys.exit(84)
+            c += 2
+
+def main():
+    i = 1
+    if len(sys.argv) == 1 :
+        sys.exit(84)
+    if sys.argv[1] == '-h' :
+        help()
+        sys.exit(0)
+    else :
+        if len(sys.argv) < 4 :
+            sys.exit(84)
+        if sys.argv[3] != '-t' and sys.argv[3] != '-r' and sys.argv[3] != '-s' and sys.argv[3] != '-z' :
+            sys.exit(84)
+        try :
+            x_result = float(sys.argv[1])
+            y_result = float(sys.argv[2])
+            x = float(sys.argv[1])
+            y = float(sys.argv[2])
+            check_args()
+
+        except : 
+            sys.exit(84)
+        i += 2
+        matrix = [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1]]
+        try :
+            while i != len(sys.argv) :
+                if sys.argv[i] == '-t' :
+                    try :
+                        matrix = compute_t(i)
+                        x_result = float(x_result) + float(sys.argv[i + 1])
+                        y_result = float(y_result) + float(sys.argv[i + 2])
+                        i += 3
+                    except :
+                        sys.exit(84)
+                elif sys.argv[i] == '-z' :
+                    try :
+                        matrix = compute_z(i)
+                        x_result = float(x_result) * float(sys.argv[i + 1])
+                        y_result = float(y_result) * float(sys.argv[i + 2])
+                        i += 3
+                    except :
+                        sys.exit(84)
+                elif sys.argv[i] == '-r' :
+                    try :
+                        matrix = compute_r(i)
+                        i += 2
+                    except :
+                        sys.exit(84)
+                elif sys.argv[i] == '-s' :
+                    try :
+                        matrix = compute_s(i)
+                        i += 2
+                    except :
+                        sys.exit(84)
+                else :
+                    sys.exit(84)
+                matrix_all.matrix_id = compute_matrix(matrix, matrix_all.matrix_id)
+        except :
+            sys.exit(84)
+        print_matrix(matrix_all.matrix_id)
+        print('(%.2f,' %x, '%.2f)' %y,'=> (%.2f,'%x_result,'%.2f)'%y_result)
+        sys.exit(0)
+
+if __name__ == "__main__":
+        main()

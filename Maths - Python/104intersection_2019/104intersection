@@ -1,0 +1,189 @@
+#!/usr/bin/python3
+
+import sys
+import math
+
+class parameter :
+    opt = 0
+    xp = 0
+    yp = 0
+    zp = 0
+    xv = 0
+    yv = 0
+    zv = 0
+    p = 0
+
+def check_args() :
+    try :
+        int(sys.argv[1])
+        int(sys.argv[2])
+        int(sys.argv[3])
+        int(sys.argv[4])
+        int(sys.argv[5])
+        int(sys.argv[6])
+        int(sys.argv[7])
+        int(sys.argv[8])
+    except :
+        sys.exit(84)
+    if len(sys.argv) != 9 :
+        sys.exit(84)
+    if int(sys.argv[1]) != 1 and int(sys.argv[1]) != 2 and int(sys.argv[1]) != 3 :
+        sys.exit(84)
+
+def help() :
+    if len(sys.argv) == 2 and sys.argv[1] == '-h' :
+        print ("USAGE")
+        print ("    ./104intersection opt xp yp zp xv yv zv p")
+        print ("DESCRIPTION")
+        print ("    opt             surface option: 1 for a sphere, 2 for a cylinder, 3 for a cone")
+        print ("    (xp, yp, zp)    coordinates of a point by which the light ray passes through")
+        print ("    (xv, yv, zv)    coordinates of a vector parallel to the light ray")
+        print ("    p               parameter: radius of the sphere, radius of the cylinder, or")
+        print ("                    angle formed by the cone and the Z-axis")
+        sys.exit(0)
+
+def sphere() :
+    if parameter.p <= 0 :
+        sys.exit(84)
+    print("Sphere of radius "+str(parameter.p))
+    print("Line passing through the point ("+str(parameter.xp)+", "+str(parameter.yp)+", "+str(parameter.zp)+") and parallel to the vector ("+str(parameter.xv)+", "+str(parameter.yv)+", "+str(parameter.zv)+")")
+    a = float(pow(parameter.xv, 2) + pow(parameter.yv, 2) + pow(parameter.zv, 2))
+    b = float(parameter.xv*2*parameter.xp + parameter.yv*2*parameter.yp + parameter.zv*2*parameter.zp)
+    c = float(pow(parameter.xp, 2) + pow(parameter.yp, 2) + pow(parameter.zp, 2) - pow(parameter.p,2))
+    descriminant = float(pow(b, 2) - 4 * a * c)
+
+    if descriminant < 0 :
+        print("No intersection point.")
+
+    if descriminant == 0 :
+        t1 = float(- (b / (2 * a)))
+        x = float(parameter.xp + parameter.xv * t1)
+        y = float(parameter.yp + parameter.yv * t1)
+        z = float(parameter.zp + parameter.zv * t1)
+        print("1 intersection point:")
+        print('(%.3f,' %float(x), '%.3f,' %float(y), '%.3f)' %float(z))
+
+    if descriminant > 0 :
+        t1 = float((-b - math.sqrt(descriminant) ) / (2 * a))
+        t2 = float((-b + math.sqrt(descriminant) ) / (2 * a))
+        x1 = float(parameter.xp + parameter.xv * t1)
+        y1 = float(parameter.yp + parameter.yv * t1)
+        z1 = float(parameter.zp + parameter.zv * t1)
+        x2 = float(parameter.xp + parameter.xv * t2)
+        y2 = float(parameter.yp + parameter.yv * t2)
+        z2 = float(parameter.zp + parameter.zv * t2)
+        print("2 intersection points:")
+        print('(%.3f,' %float(x2), '%.3f,' %float(y2), '%.3f)' %float(z2))
+        print('(%.3f,' %float(x1), '%.3f,' %float(y1), '%.3f)' %float(z1))
+
+
+def cylinder() :
+    infiny = 0
+    if parameter.p <= 0 :
+        sys.exit(84)
+    print("Cylinder of radius "+str(parameter.p))
+    print("Line passing through the point ("+str(parameter.xp)+", "+str(parameter.yp)+", "+str(parameter.zp)+") and parallel to the vector ("+str(parameter.xv)+", "+str(parameter.yv)+", "+str(parameter.zv)+")")
+    a = float(parameter.xv + parameter.yv)
+    b = float( 2 * (parameter.xv * parameter.xp + parameter.yv * parameter.yp))
+    c = float(pow(parameter.xp,2) + pow(parameter.yp, 2) - pow(parameter.p, 2))
+    descriminant = float(pow(b, 2) - 4 * a * c)
+
+    if descriminant < 0 :
+        print("No intersection point.")
+
+    if descriminant == 0 :
+        try:
+            t1 = float(- (b / (2 * a)))
+        except :
+            t1 = 1
+            infiny = 1
+        x = float(parameter.xp + parameter.xv * t1)
+        y = float(parameter.yp + parameter.yv * t1)
+        z = float(parameter.zp + parameter.zv * t1)
+        if infiny == 0 :
+            print("1 intersection point:")
+            print('(%.3f,' %float(x), '%.3f,' %float(y), '%.3f)' %float(z))
+        else:
+            print("There is an infinite number of intersection points.")
+
+
+    if descriminant > 0 :
+        t1 = float((-b - math.sqrt(descriminant) ) / (2 * a))
+        t2 = float((-b + math.sqrt(descriminant) ) / (2 * a))
+        x1 = float(parameter.xp + parameter.xv * t1)
+        y1 = float(parameter.yp + parameter.yv * t1)
+        z1 = float(parameter.zp + parameter.zv * t1)
+        x2 = float(parameter.xp + parameter.xv * t2)
+        y2 = float(parameter.yp + parameter.yv * t2)
+        z2 = float(parameter.zp + parameter.zv * t2)
+        print("2 intersection points:")
+        print('(%.3f,' %float(x2), '%.3f,' %float(y2), '%.3f)' %float(z2))
+        print('(%.3f,' %float(x1), '%.3f,' %float(y1), '%.3f)' %float(z1))
+
+def cone() :
+    if parameter.p <= 0 or parameter.p >= 90 :
+        sys.exit(84)
+    rad = math.radians(parameter.p)
+    print("Cone with a"+str(parameter.p)+" degree angle")
+    print("Line passing through the point ("+str(parameter.xp)+", "+str(parameter.yp)+", "+str(parameter.zp)+") and parallel to the vector ("+str(parameter.xv)+", "+str(parameter.yv)+", "+str(parameter.zv)+")")
+    a = float(parameter.xv + parameter.yv - pow(parameter.zv, 2) * pow(math.tan(rad), 2))
+    b = float( 2 * (parameter.xv * parameter.xp + parameter.yv * parameter.yp - pow(math.tan(rad),2) * parameter.zp*parameter.zv))
+    c = float(pow(parameter.xp,2) + pow(parameter.yp, 2) - pow(math.tan(rad),2) * pow(parameter.zp, 2))
+    descriminant = float(pow(b, 2) - 4 * a * c)
+
+    if descriminant < 0 :
+        print("No intersection point.")
+
+    if descriminant == 0 :
+        try:
+            t1 = float(- (b / (2 * a)))
+        except :
+            t1 = 1
+            infiny = 1
+        x = float(parameter.xp + parameter.xv * t1)
+        y = float(parameter.yp + parameter.yv * t1)
+        z = float(parameter.zp + parameter.zv * t1)
+        if infiny == 0 :
+            print("1 intersection point:")
+            print('(%.3f,' %float(x), '%.3f,' %float(y), '%.3f)' %float(z))
+        else:
+            print("There is an infinite number of intersection points.")
+
+    if descriminant > 0 :
+        t1 = float((-b - math.sqrt(descriminant) ) / (2 * a))
+        t2 = float((-b + math.sqrt(descriminant) ) / (2 * a))
+        x1 = float(parameter.xp + parameter.xv * t1)
+        y1 = float(parameter.yp + parameter.yv * t1)
+        z1 = float(parameter.zp + parameter.zv * t1)
+        x2 = float(parameter.xp + parameter.xv * t2)
+        y2 = float(parameter.yp + parameter.yv * t2)
+        z2 = float(parameter.zp + parameter.zv * t2)
+        print("2 intersection points:")
+        print('(%.3f,' %float(x2), '%.3f,' %float(y2), '%.3f)' %float(z2))
+        print('(%.3f,' %float(x1), '%.3f,' %float(y1), '%.3f)' %float(z1))
+
+def apply_args() :
+    parameter.opt = int(sys.argv[1])
+    parameter.xp = int(sys.argv[2])
+    parameter.yp = int(sys.argv[3])
+    parameter.zp = int(sys.argv[4])
+    parameter.xv = int(sys.argv[5])
+    parameter.yv = int(sys.argv[6])
+    parameter.zv = int(sys.argv[7])
+    parameter.p = int(sys.argv[8])
+
+def main():
+    help()
+    check_args()
+    apply_args()
+    if parameter.xv == 0 and parameter.yv == 0 and parameter.zv == 0 :
+        sys.exit(84)
+    if parameter.opt == 1 :
+        sphere()
+    if parameter.opt == 2 :
+        cylinder()
+    if parameter.opt == 3 :
+        cone()
+
+if __name__ == "__main__" :
+    main()

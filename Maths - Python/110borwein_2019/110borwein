@@ -1,0 +1,100 @@
+#!/usr/bin/python3
+
+import sys
+import math
+
+def help():
+    print("USAGE")
+    print("    ./110borwein n\n")
+    print("DESCRIPTION")
+    print("    n    constant defining the integral to be computed")
+    sys.exit(0)
+
+def check_args():
+    if (len(sys.argv) == 2 and sys.argv[1] == "-h"):
+        help()
+    if len(sys.argv) != 2 :
+        sys.exit(84)
+    try:
+        int(sys.argv[1])
+    except:
+        sys.exit(84)
+    if (float(sys.argv[1]).is_integer() == False):
+        sys.exit(84)
+    if int(sys.argv[1]) < 0 :
+        sys.exit(84)
+
+def borwein(x, n):
+    result = 1
+
+    if x == 0 :
+        return 1
+    for i in range (0, n + 1) :
+        numerator = float(math.sin(x / ((2 * i) + 1)))
+        denominator = float(x / ((2 * i) + 1))
+        result = result * float(numerator / denominator)
+    return result
+
+def midpoint(n):
+    result = 0
+    center = 0.25
+    x1 = 0
+    x2 = 0.5
+    pi = 1.57079632679
+    dif = 0
+
+    print("Midpoint:")
+    for i in range (0, 10000) :
+        result = result + 0.5 * borwein(center, n)
+        x1 += 0.5
+        x2 += 0.5
+        center = x2 - 0.25
+    print('I{0} = {1:.10f}'.format(n, result, 10))
+    dif = float(pi - result)
+    print('diff = {0:.10f}'.format(dif))
+
+def trapez(n):
+    result = 0
+    x1 = 0
+    x2 = 0.5
+    pi = 1.57079632679
+    dif = 0
+
+    print("Trapezoidal:")
+    for i in range (0, 10000) :
+        result = result + ((0.5 / 2) * (borwein(x1, n) + borwein(x2, n)))
+        x1 += 0.5
+        x2 += 0.5
+    print('I{0} = {1:.10f}'.format(n, result, 10))
+    dif = float(pi - result)
+    print('diff = {0:.10f}'.format(dif))
+
+def simpson(n):
+    result = 0
+    x1 = 0
+    x2 = 0.5
+    x3 = 1
+    pi = 1.57079632679
+    dif = 0
+
+    print("Simpson:")
+    for i in range (0, 10000) :
+        result = result + ((0.5 / 3) * ((borwein(x1, n) + (4 * borwein(x2, n)) + borwein(x3, n))))
+        x1 += 1
+        x2 += 1
+        x3 += 1
+    
+    print('I{0} = {1:.10f}'.format(n, result, 10))
+    dif = float(pi - result)
+    print('diff = {0:.10f}'.format(dif))
+
+def main():
+    check_args()
+    n = int(sys.argv[1])
+    midpoint(n)
+    print()
+    trapez(n)
+    print()
+    simpson(n)
+if __name__ == "__main__":
+        main()

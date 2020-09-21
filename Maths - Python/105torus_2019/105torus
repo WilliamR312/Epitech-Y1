@@ -1,0 +1,178 @@
+#!/usr/bin/python3
+
+import sys
+import math
+
+class parameter :
+    opt = 0
+    a0 = 0
+    a1 = 0
+    a2 = 0
+    a3 = 0
+    a4 = 0
+    n = 0
+
+def check_args() :
+    try :
+        int(sys.argv[1])
+        int(sys.argv[2])
+        int(sys.argv[3])
+        int(sys.argv[4])
+        int(sys.argv[5])
+        int(sys.argv[6])
+        int(sys.argv[7])
+    except :
+        sys.exit(84)
+    if int(sys.argv[7]) <= 0 or len(sys.argv) != 8 :
+        sys.exit(84)
+
+def help() :
+    if len(sys.argv) == 2 and sys.argv[1] == '-h' :
+        print ("USAGE")
+        print ("    ./105torus opt a0 a1 a2 a3 a4 n")
+        print ("DESCRIPTION")
+        print ("    opt       method option:")
+        print ("                  1 for the bisection method")
+        print ("                  2 for Newton's method")
+        print ("                  3 for the secant method")
+        print ("    a[0-4]    method option:")
+        print ("    n         precision (the application of the polynomial to the solution should")
+        print ("              be smaller than 10^-n)")
+        sys.exit(0)
+
+def apply_args() :
+    parameter.opt = int(sys.argv[1])
+    parameter.a0 = int(sys.argv[2])
+    parameter.a1 = int(sys.argv[3])
+    parameter.a2 = int(sys.argv[4])
+    parameter.a3 = int(sys.argv[5])
+    parameter.a4 = int(sys.argv[6])
+    parameter.n = int(sys.argv[7])
+
+def bisection() :
+    a = 0
+    b = 1
+    m = 0
+    iter = 0
+
+    while float((b - a)) > pow(10,- parameter.n) :
+        m = float((a + b) / 2)
+        y = float(parameter.a4 * math.pow(m, 4) + parameter.a3 * math.pow(m, 3) + parameter.a2 * math.pow(m, 2) + parameter.a1 * m + parameter.a0)
+        if len(str(m)) - 2 <= parameter.n :
+            print("x = "+str(m))
+        else :
+            r = round(m, parameter.n)
+            if len(str(round(m, parameter.n))) - 2 < parameter.n :
+                print("x = "+str(r), end = '')
+                nb = parameter.n - (len(str(round(m, parameter.n))) - 2)
+                while nb > 0 :
+                    print("0", end = '')
+                    nb = nb - 1
+                print('')
+            else :
+                print("x = "+str(r))
+        if y > 0 :
+            b = m
+        else :
+            a = m
+        iter = iter + 1
+        if iter == 1242 :
+            sys.exit(84)
+
+def newton() :
+
+    k = 0.5
+    f = float(parameter.a4 * math.pow(k, 4) + parameter.a3 * math.pow(k, 3) + parameter.a2 * math.pow(k, 2) + parameter.a1 * k + parameter.a0)
+    fd = float(4 * parameter.a4 * math.pow(k, 3) + 3 * parameter.a3 * math.pow(k, 2) + 2 * parameter.a2 * k + parameter.a1)
+    iter = 0
+
+    while abs(f) > pow(10, -parameter.n) :
+        if len(str(k)) - 2 <= parameter.n :
+            print("x = "+str(k))
+        else :
+            r = round(k, parameter.n)
+            if len(str(round(k, parameter.n))) - 2 < parameter.n :
+                print("x = "+str(r), end = '')
+                nb = parameter.n - (len(str(round(k, parameter.n))) - 2)
+                while nb > 0 :
+                    print("0", end = '')
+                    nb = nb - 1
+                print('')
+            else :
+                print("x = "+str(r))
+
+        iter = iter + 1
+        if iter == 1242 :
+            sys.exit(84)
+
+        k = float(k - (f / fd))
+        f = float(parameter.a4 * math.pow(k, 4) + parameter.a3 * math.pow(k, 3) + parameter.a2 * math.pow(k, 2) + parameter.a1 * k + parameter.a0)
+        fd = float(4 * parameter.a4 * math.pow(k, 3) + 3 * parameter.a3 * math.pow(k, 2) + 2 * parameter.a2 * k + parameter.a1)
+
+    if len(str(k)) - 2 <= parameter.n :
+        print("x = "+str(k))
+    else :
+        r = round(k, parameter.n)
+        if len(str(round(k, parameter.n))) - 2 < parameter.n :
+            print("x = "+str(r), end = '')
+            nb = parameter.n - (len(str(round(k, parameter.n))) - 2)
+            while nb > 0 :
+                print("0", end = '')
+                nb = nb - 1
+            print('')
+        else :
+            print("x = "+str(r))
+
+
+def secant() :
+    a = 0
+    b = 1
+    save = 0
+    iter = 0
+    fa = parameter.a4 * math.pow(a, 4) + parameter.a3 * math.pow(a, 3) + parameter.a2 * math.pow(a, 2) + parameter.a1 * a + parameter.a0
+    fb = parameter.a4 * math.pow(b, 4) + parameter.a3 * math.pow(b, 3) + parameter.a2 * math.pow(b, 2) + parameter.a1 * b + parameter.a0
+    while abs(fb) > pow(10,-parameter.n) :
+        save = b
+        try :
+            b = b - (a - b) / (fa - fb) * fb
+        except :
+            sys.exit(84)
+        a = save
+        fb = parameter.a4 * math.pow(b, 4) + parameter.a3 * math.pow(b, 3) + parameter.a2 * math.pow(b, 2) + parameter.a1 * b + parameter.a0
+        fa = parameter.a4 * math.pow(a, 4) + parameter.a3 * math.pow(a, 3) + parameter.a2 * math.pow(a, 2) + parameter.a1 * a + parameter.a0
+        if len(str(b)) - 2 <= parameter.n :
+            print("x = "+str(b))
+        else :
+            r = round(b, parameter.n)
+            if len(str(round(b, parameter.n))) - 2 < parameter.n :
+                print("x = "+str(r), end = '')
+                nb = parameter.n - (len(str(round(b, parameter.n))) - 2)
+                while nb > 0 :
+                    print("0", end = '')
+                    nb = nb - 1
+                print('')
+            else :
+                print("x = "+str(r))
+        iter = iter + 1
+        if iter == 1242 :
+            sys.exit(84)
+
+
+def main():
+    help()
+    check_args()
+    apply_args()
+    if parameter.opt != 1 and parameter.opt != 2 and parameter.opt != 3 :
+        sys.exit(84)
+    try :
+        if parameter.opt == 1 :
+            bisection()
+        if parameter.opt == 2 :
+            newton()
+        if parameter.opt == 3 :
+            secant()
+    except :
+        sys.exit(84)
+
+if __name__ == "__main__" :
+    main()

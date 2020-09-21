@@ -1,0 +1,194 @@
+#!/usr/bin/python3
+
+import sys
+import math
+
+def help():
+    print("USAGE")
+    print("    ./108trigo fun a0 a1 a2 ...")
+    print("DESCRIPTION")
+    print("    fun    function to be applied, among at least "'EXP'", "'COS'", "'SIN'", "'COSH'"")
+    print("    and "'SINH'"")
+    print("    ai    coeficients of the matrix")
+    sys.exit(0)
+
+def check_args():
+
+    msize = 0.0
+
+    if (len(sys.argv) == 2 and sys.argv[1] == "-h"):
+        help()
+    if (len(sys.argv) <= 2):
+        sys.exit(84)
+    if (sys.argv[1] != "EXP" and sys.argv[1] != "COS" and sys.argv[1] != "SINH" and sys.argv[1] != "COSH" and sys.argv[1] != "SIN"):
+        sys.exit(84)
+    for i in range(2, len(sys.argv)):
+        try:
+            int(sys.argv[i])
+        except:
+            sys.exit(84)
+    msize = math.sqrt(len(sys.argv) - 2)
+    if ((msize).is_integer() == False):
+        sys.exit(84)
+    return msize
+
+def get_matrix_id(size) :
+    id_matrix = []
+    one_pos = 0
+    for j in range (0, int(size)) :
+        for i in range (0, int(size)) :
+            matrix_line = [0] * int(size)
+        id_matrix.append(matrix_line)
+    for y in range (0, int(size)) :
+        id_matrix[y][one_pos] = 1
+        one_pos += 1
+    return (id_matrix)
+
+def generate_matrix(msize) :
+    j = 2
+    matrix_result = []
+    for liste_x in range(0, int(msize)) :
+        matrix_fill = []
+        for i in range(0, int(msize)) :
+            matrix_fill.append(sys.argv[j])
+            j += 1
+        matrix_result.append(matrix_fill)
+        matrix_fill = []
+    return (matrix_result)
+
+
+def mult_scal_matrix(matrix, nb, size) :
+    matrix_result = []
+    for i in range(0, int(size)) :
+        matrix_line = [0] * int(size)
+        for j in range(0, int(size)) :
+            matrix_line[j] = float(float(matrix[i][j]) * float(nb))
+        matrix_result.append(matrix_line)
+    return (matrix_result)  
+    
+
+def add_2_matrix(matrix_a, matrix_b, size) :
+    matrix_result = []
+    for i in range(0, int(size)) :
+        matrix_line = [0] * int(size)
+        for j in range(0, int(size)) :
+            matrix_line[j] = float(float(matrix_a[i][j]) + float(matrix_b[i][j]))
+        matrix_result.append(matrix_line)
+    return (matrix_result)
+
+def sub_2_matrix(matrix_a, matrix_b, size) :
+    matrix_result = []
+    for i in range(0, int(size)) :
+        matrix_line = [0] * int(size)
+        for j in range(0, int(size)) :
+            matrix_line[j] = float(float(matrix_a[i][j]) - float(matrix_b[i][j]))
+        matrix_result.append(matrix_line)
+    return (matrix_result)
+
+def mult_2_matrix(matrix_a, matrix_b, size) :
+    matrix_result = []
+    for line in range (0, int(size)) :
+        matrix_line = [0] * int(size)
+        for j in range (0, int(size)) :
+            for i in range (0, int(size)) :
+                matrix_line[j] = float(float(matrix_line[j]) + float(float(matrix_a[line][i]) * float(matrix_b[i][j])))
+        matrix_result.append(matrix_line)
+    return (matrix_result)
+
+def matrix_pow(matrix, size, pow) :
+    matrix_result = matrix
+    for pow in range(1, pow) :
+        matrix_result = mult_2_matrix(matrix_result, matrix, size)
+    return (matrix_result)
+
+def print_matrix(matrix, size) :
+    for y in range(0, int(size)) :
+        for x in range(0, int(size)) :
+            print('{:.2f}'.format(round(matrix[y][x], 2)), end='')
+            if x < int(size) - 1 :
+                print("\t", end ='')
+        print()
+
+def exp_compute(size, matrix_base):
+    matrix_id = get_matrix_id(size)
+    matrix_result = add_2_matrix(matrix_id, matrix_base, size)
+    matrix_n = matrix_base
+    n = 0
+
+    while n < 200:
+        matrix_n = matrix_pow(matrix_base, size, n + 2)
+        matrix_local = mult_scal_matrix(matrix_n, float(1/math.factorial(n + 2)), size)
+        matrix_result = add_2_matrix(matrix_result, matrix_local, size)
+        n += 1
+    print_matrix(matrix_result, size)
+    sys.exit(0)
+
+def sin_compute(size, matrix_base):
+    matrix_result = matrix_base
+    n = 1
+    while n < 105:
+        matrix_n = matrix_pow(matrix_base, size, (2*(n)) + 1)
+        matrix_local = mult_scal_matrix(matrix_n, float(1/math.factorial((2 * (n)) + 1)), size)
+        if n % 2 == 0 :
+            matrix_result = add_2_matrix(matrix_result, matrix_local, size)
+        else :
+            matrix_result = sub_2_matrix(matrix_result, matrix_local, size)
+        n += 1
+    print_matrix(matrix_result, size)
+    sys.exit(0)
+
+
+def sinh_compute(size, matrix_base):
+    matrix_result = matrix_base
+    matrix_n = matrix_base
+    n = 1
+    while n < 108:
+        matrix_n = matrix_pow(matrix_base, size, (2*(n)) + 1)
+        matrix_local = mult_scal_matrix(matrix_n, float(1/math.factorial((2 * (n)) + 1)), size)
+        matrix_result = add_2_matrix(matrix_result, matrix_local, size)
+        n += 1
+    print_matrix(matrix_result, size)
+    sys.exit(0)
+
+def cos_compute(size, matrix_base):
+    matrix_result = get_matrix_id(size)
+    n = 1
+    while n < 108:
+        matrix_n = matrix_pow(matrix_base, size, (2 * n))
+        matrix_local = mult_scal_matrix(matrix_n, float(1/math.factorial(2 * n)), size)
+        if n % 2 == 0 :
+            matrix_result = add_2_matrix(matrix_result, matrix_local, size)
+        else :
+            matrix_result = sub_2_matrix(matrix_result, matrix_local, size)
+        n += 1
+    print_matrix(matrix_result, size)
+    sys.exit(0)
+
+def cosh_compute(size, matrix_base):
+    matrix_result = get_matrix_id(size)
+    n = 1
+    while n < 108:
+        matrix_n = matrix_pow(matrix_base, size, (2 * n))
+        matrix_local = mult_scal_matrix(matrix_n, float(1/math.factorial(2 * n)), size)
+        matrix_result = add_2_matrix(matrix_result, matrix_local, size)
+        n += 1
+    print_matrix(matrix_result, size)
+    sys.exit(0)
+
+def main():
+    msize = 0
+    msize = check_args()
+    matrix = generate_matrix(msize)
+
+    if (str(sys.argv[1]) == "EXP"):
+        exp_compute(msize, matrix)
+    if (str(sys.argv[1]) == "SIN"):
+        sin_compute(msize, matrix)
+    if (str(sys.argv[1]) == "SINH"):
+        sinh_compute(msize, matrix)
+    if (str(sys.argv[1]) == "COS"):
+        cos_compute(msize, matrix)
+    if (str(sys.argv[1]) == "COSH"):
+        cosh_compute(msize, matrix)
+if __name__ == "__main__":
+        main()

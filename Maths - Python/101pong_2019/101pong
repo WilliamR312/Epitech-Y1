@@ -1,0 +1,75 @@
+#!/usr/bin/python3
+
+import math
+import sys
+
+def help():
+    print("USAGE")
+    print("    ./101pong x0 y0 z0 x1 y1 z1 n\n")
+    print("DESCRIPTION")
+    print("    x0 ball abscissa at time t - 1")
+    print("    y0 ball ordinate at time t - 1")
+    print("    z0 ball ordinate at time t - 1")
+    print("    x1 ball ordinate at time t")
+    print("    y1 ball ordinate at time t")
+    print("    z1 ball ordinate at time t")
+    print("    n time shift (greater than or equal to zero, integer)")
+
+def main():
+    if (len(sys.argv) < 2) or (len(sys.argv) > 8):
+        print("invaid value")
+        sys.exit(84)
+    else:
+        x0 = sys.argv[1]
+        if x0 == "-h":
+            help()
+            sys.exit(0)
+        try:
+            x0 = float(sys.argv[1])
+            y0 = float(sys.argv[2])
+            z0 = float(sys.argv[3])
+            x1 = float(sys.argv[4])
+            y1 = float(sys.argv[5])
+            z1 = float(sys.argv[6])
+            n = int(sys.argv[7])
+        except:
+            print("invaid value")
+            sys.exit(84)
+    if n < 0:
+        print("invalid value")
+        sys.exit(84)
+    print("The velocity vector of the ball is:")
+    resultx = x1 - x0
+    resulty = y1 - y0
+    resultz = z1 - z0
+    print('(%.2f,' %resultx, '%.2f,' %resulty, '%.2f)' %resultz)
+
+    print("At time t + "+ str(n)+", ball coordinates will be:")
+    resultx_time = x1 + (resultx * n)
+    resulty_time = y1 + (resulty * n)
+    resultz_time = z1 + (resultz * n)
+    print('(%.2f,' %resultx_time, '%.2f,' %resulty_time, '%.2f)' %resultz_time)
+
+    if ((z1 < 0 and resultz_time < 0) or (z1 > 0 and resultz_time > 0)):
+        print("The ball won’t reach the paddle.")
+    else:
+        print("The incidence angle is:")
+        prod_scal = resultx * 0 + resulty * 0 + resultz * 1
+        norm_a = math.sqrt(math.pow(resultx, 2) + math.pow(resulty, 2) + math.pow(resultz, 2))
+        norm_b = math.sqrt(math.pow(1, 2))
+        t_norm = norm_a * norm_b
+        if t_norm == 0:
+            cos_0 = prod_scal
+        else:
+            cos_0 = prod_scal / t_norm
+        Op = math.acos(cos_0)
+        Deg = math.degrees(Op)
+        if Deg > 90:
+            Deg = Deg - 90
+        elif Deg < 0:
+            Deg = Deg + 90
+        print('%.2f'%Deg, "degrees")
+    sys.exit(0)
+
+if __name__ == "__main__":
+        main()

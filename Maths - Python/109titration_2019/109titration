@@ -1,0 +1,130 @@
+#!/usr/bin/python3
+
+import sys
+import math
+import re
+import array
+from numpy import zeros, array
+
+def split_string(arr):
+    i = 0
+    ph = []
+    vol = []
+    indexer = len(arr) - 1
+    if arr[len(arr) - 1] != "" :
+        indexer = indexer + 1
+    for i in range (0, indexer):
+        if i % 2 != 0:
+            ph.append(arr[i])
+        else:
+            vol.append(arr[i])
+        i = i + 1
+    ph = list(map(float, ph))
+    vol = list(map(float, vol))
+    compute(ph, vol)
+    sys.exit(0)
+
+def read_csv():
+    arr = []
+    fname = sys.argv[1]
+    try:
+        with open(fname) as file:
+            try:
+                reader = file.read()
+                arr = re.split('[;,\n]', reader)
+            except:
+                sys.exit(84)
+            finally:
+                file.close()
+            split_string(arr)
+        sys.exit(0)
+    except:
+        sys.exit(84)
+
+
+
+def compute(ph, vol):
+    i = 1
+    result = len(ph) * [0]
+    print ("Derivative:")
+    for i in range(1, len(ph) - 1):
+        coef1 = (vol[i] - vol[i - 1]) / (vol[i + 1] - vol[i - 1])
+        coef2 = (vol[i + 1] - vol[i]) / (vol[i + 1] - vol[i - 1])
+        result[i] = (ph[i + 1] - ph[i]) / (vol[i + 1] - vol[i]) *coef1 + (ph[i] - ph[i - 1]) / (vol[i] - vol[i - 1]) * coef2
+        print(vol[i], 'ml ' '-> ''%.2f' %result[i])
+        i = i + 1
+    define_equivalence_point(result, ph, vol)
+    compute_second_derivative(result, ph, vol)
+    sys.exit(0)
+
+def compute_second_derivative(result, ph, vol):
+    i = 0
+    result2 = len(result) * [0]
+    print("second derivative:")
+    for i in range(2, len(result) - 2):
+        coef1 = (vol[i] - vol[i - 1]) / (vol[i + 1] - vol[i - 1])
+        coef2 = (vol[i + 1] - vol[i]) / (vol[i + 1] - vol[i - 1])
+        result2[i] = (result[i + 1] - result[i]) / (vol[i + 1] - vol[i]) *coef1 + (result[i] - result[i - 1]) / (vol[i] - vol[i - 1]) * coef2
+        print(vol[i], 'ml ' '-> ''%.2f' %result2[i])
+    compute_second_derivative_estimated(result, result2, ph, vol)
+
+def compute_second_derivative_estimated(result, result2, ph, vol):
+    i = 0
+    j = 0
+    new_vol = 0
+
+    while (result[i] != max(result)):
+        i = i + 1
+    size = ((vol[i + 1] - vol[i - 1]) * 10) + 1
+    new_vol = int(size) * [0]
+    result3 = int(size) * [0]
+    new_vol[0] = vol[i - 1]
+    j += 1
+    for j in range(int(size)):
+        if j != 0:
+            new_vol[j] = (new_vol[j - 1] + 0.1)
+    j = 0
+    print("\nSecond derivative estimated:")
+    for j in range(int(size)):
+        if new_vol[j] <= vol[i]:
+            result3[j] = (result2[i - 1] * ((vol[i] - new_vol[j]) / (vol[i] - vol[i - 1]))) + ((result2[i] * (new_vol[j] - vol[i - 1]) / (vol[i] - vol[i - 1])))
+        else:
+            result3[j] = (result2[i] * ((vol[i + 1] - new_vol[j]) / (vol[i + 1] - vol[i]))) + ((result2[i + 1] * (new_vol[j] - vol[i]) / (vol[i + 1] - vol[i])))
+        print('%.1f' %new_vol[j], 'ml ' '-> ''%.2f' %result3[j])
+    second_equivalence_point(result3, size, new_vol)
+    sys.exit(0)
+
+def second_equivalence_point(result3, size, new_vol):
+    equivalence = int(size) * [0]
+    for j in range(int(size)):
+        equivalence[j] = abs(result3[j])
+    j = 0
+    while (equivalence[j] != min(equivalence)):
+        j = j + 1
+    print("\nEquivalence point at", '%.1f' %new_vol[j], "ml")
+
+
+def define_equivalence_point(result, ph, vol):
+    i = 0
+    while (result[i] != max(result)):
+        i = i + 1
+    print("\nEquivalence point at", vol[i], "ml\n")
+
+def help():
+    print("USAGE")
+    print("    ./109.titration file\n")
+    print("DESCRIPTION")
+    print("    file    a csv file containing ""vol;ph"" lines")
+    sys.exit(0)
+
+def check_args():
+    if (len(sys.argv) == 2 and sys.argv[1] == "-h"):
+        help()
+    if len(sys.argv) != 2 :
+        sys.exit(84)
+
+def main():
+    check_args()
+    read_csv()
+if __name__ == "__main__":
+        main()

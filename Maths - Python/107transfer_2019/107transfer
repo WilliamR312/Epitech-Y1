@@ -1,0 +1,90 @@
+#!/usr/bin/python3
+
+import sys
+import math
+
+def check_alpha_star():
+    for i in range(1, len(sys.argv)):
+        for j in range(0, len(sys.argv[i])) :
+            if sys.argv[i][j] != '*' and (sys.argv[i][j] < '0' or sys.argv[i][j] > '9') and sys.argv[i][j] != '.' and sys.argv[i][j] != '-' and sys.argv[i][j] != '+':
+                sys.exit(84)
+
+def check_double_star():
+    i = 1
+    j = 0
+    while i != len(sys.argv):
+        while j != len(sys.argv[i]):
+            if (sys.argv[i][0] == '*' or sys.argv[i][len(sys.argv[i]) - 1] == '*') or (sys.argv[i][j] == '*' and sys.argv[i][j + 1] == '*'):
+                sys.exit(84)
+            j += 1
+        i += 1
+        j = 0
+
+def check_args():
+    if len(sys.argv) == 2 and sys.argv[1] == '-h':
+        help()
+    if ((len(sys.argv) - 1) % 2 ) != 0 or len(sys.argv) < 2 :
+        sys.exit(84)
+    """
+    check_alpha_star()
+    check_double_star()
+    """
+    return
+
+def help():
+    if sys.argv[1] == '-h' and len(sys.argv) == 2:
+        print('USAGE')
+        print('    ./107transfer [num den]*')
+        print('\n')
+        print('DESCRIPTION')
+        print('    num    polynomial numerator defined by its coefficients')
+        print('    den    polynomial denominator defined by its coefficients')
+    sys.exit(0)
+
+def compute_pol(list_1, list_2, x):
+    nb_elem_1 = len(list_1)
+    nb_elem_2 = len(list_2)
+    result_1 = 0
+    result_2 = 0
+    result_result = 0
+
+    try :
+        while nb_elem_1 > 0 :
+            result_1 = float(float(list_1[nb_elem_1 - 1]) + (float(x) * result_1))
+            nb_elem_1 = nb_elem_1 - 1
+        while nb_elem_2 > 0 :
+            result_2 = float(float(list_2[nb_elem_2 - 1]) + (float(x) * result_2))
+            nb_elem_2 = nb_elem_2 - 1
+    except:
+        sys.exit(84)
+    try :
+        result_result = float(result_1 / result_2)
+    except :
+        sys.exit(84)
+    return (result_result)
+
+def main():
+    check_args()
+    num = 1
+    den = 2
+    nb_argv = len(sys.argv) - 1
+    result = 1
+    x = 0
+
+    while x <= 1.001:
+        while den <= nb_argv:
+            list_1 = sys.argv[num].split('*')
+            list_2 = sys.argv[den].split('*')
+            result = result * compute_pol(list_1, list_2, x)
+            num += 2
+            den += 2
+        print('%.3f' %x, end = '')
+        print(' -> %.5f' %result)
+        result = 1
+        num = 1
+        den = 2
+        x += 0.001
+    return (0)
+
+if __name__ == "__main__":
+        main()
